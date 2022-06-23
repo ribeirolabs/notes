@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+}
+
+datasource db {
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  shadowDatabaseUrl    = env("SHADOW_URL")
+  referentialIntegrity = "prisma"
+}
+
+model User {
+  id           String @id @default(cuid())
+  name         String
+  email        String @unique
+  token        String
+  avatar       String
+  defaultGroup String
+
+  groups UsersOnGroups[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email, token])
+}
+
+model Group {
+  id   String @id @default(cuid())
+  name String @unique
+
+  users UsersOnGroups[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UsersOnGroups {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String
+
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  groupId String
+
+  @@id([userId, groupId])
+}
+
+model Note {
+  id        String    @id @default(cuid())
+  title     String    @db.VarChar(100)
+  content   String    @db.LongText
+  fixed     Boolean   @default(false)
+  completed Boolean   @default(false)
+  dueDate   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([title, fixed, completed, dueDate])
+}
