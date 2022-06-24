@@ -13,14 +13,14 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div>
+    <div className="prose">
       <h1>Notes</h1>
 
-      <ol>
+      <ul>
         {data.map((note) => (
           <li key={note}>note</li>
         ))}
-      </ol>
+      </ul>
     </div>
   );
 };
